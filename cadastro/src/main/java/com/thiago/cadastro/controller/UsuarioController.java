@@ -33,15 +33,25 @@ public class UsuarioController {
 	 public UsuarioController(UsuarioRepository usuarioRepository) {
 	        this.usuarioRepository = usuarioRepository;
 	    }
-	
+
+	 @Operation(description = "cadastra uma pessoa passando os campos")
+		@ApiResponses(value = {
+				@ApiResponse(responseCode = "200", description = "retorna a mensagem 'Cadastro realizado', "
+				+ "indicando que a operação foi realizada"),
+				@ApiResponse(responseCode = "400", description = "quer dizer que ocorreu um erro durante o cadastro, "
+				+ "pode ser a falta de um campo ou a forma escrita")
+})
 	@PostMapping
 	public String registerUsuario(@RequestBody UsuarioModel usuario) {
 		return usuarioService.registerUsuario(usuario);
 	}
-	@Operation(description = "busca uma pessoa por id")
-	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Retorna uma pessoa"),
-			@ApiResponse(responseCode = "400", description = "Não existe a pessoa com este id")
-	})
+	 
+	 
+	 @Operation(description = "busca uma pessoa por um id existente")
+		@ApiResponses(value = {
+				@ApiResponse(responseCode = "200", description = "retorna uma pessoa existente"),
+				@ApiResponse(responseCode = "404", description = "este usuário não existe/id inexistente")
+})
 	@GetMapping("/{id}")
 	public ResponseEntity<UsuarioDto> getUsuarioById(@PathVariable Long id) {
 		return usuarioRepository.findById(id)
@@ -49,20 +59,37 @@ public class UsuarioController {
 	            .orElse(ResponseEntity.notFound().build());
 	    }
 	
+	 @Operation(description = "retorna todos os usuarios cadastrados no banco de dados")
+		@ApiResponses(value = {
+				@ApiResponse(responseCode = "200", description = "retorna todos os usuários cadastrados")
+		})
 	@GetMapping("/all")
 	public List<UsuarioModel> getAllUsuarios(){
 		return usuarioService.findAllUsuarios();
 	}
 	
+	 @Operation(description = "deleta um usuário existete passando o id")
+		@ApiResponses(value = {
+				@ApiResponse(responseCode = "200", description = "deleta uma pessoa existente e retorna a mensagem 'Usuário deletado'"),
+				@ApiResponse(responseCode = "404", description = "este usuário não existe/id inexistente")
+		})
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteUsuario(@PathVariable Long id){
 		usuarioService.deleteUsuario(id);
 		return ResponseEntity.ok("Usuário deletado com sucesso!");
 	}
 	
+	
+	 @Operation(description = "atualiza um usuário existente passando o id")
+		@ApiResponses(value = {
+				@ApiResponse(responseCode = "200", description = "atualiza uma pessoa existente passando seu id e a retorna"),
+				@ApiResponse(responseCode = "404", description = "se não passar ou passar um id existente,"
+				+ "ele dará como não encontrado/não existente")
+		})
 	@PutMapping("/{id}")
 	public ResponseEntity<UsuarioModel> updateUsuario(@PathVariable Long id, @RequestBody UsuarioModel usuarioAtualizado){
 		UsuarioModel usuario = usuarioService.updateUsuario(id, usuarioAtualizado);
-		return ResponseEntity.ok(usuario); //Retorna o usuário atualizado
+		return ResponseEntity.ok(usuario); 
 	}
+}
 }
